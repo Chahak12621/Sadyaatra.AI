@@ -1,0 +1,57 @@
+### Database Schema ####
+CREATE TABLE public.agent_profiles (
+  id uuid NOT NULL,
+  email text NOT NULL,
+  full_name text NOT NULL,
+  phone text,
+  dob date,
+  gender text,
+  address text,
+  city text,
+  state text,
+  pincode text,
+  vehicle_type text,
+  vehicle_number text,
+  vehicle_model text,
+  vehicle_year text,
+  vehicle_color text,
+  seating_capacity text,
+  aadhar_number text,
+  pan_number text,
+  licence_number text,
+  licence_expiry date,
+  aadhar_front_url text,
+  aadhar_back_url text,
+  licence_image_url text,
+  vehicle_rc_url text,
+  vehicle_insurance_url text,
+  profile_photo_url text,
+  role text NOT NULL DEFAULT 'agent'::text CHECK (role = 'agent'::text),
+  status text NOT NULL DEFAULT 'pending_review'::text CHECK (status = ANY (ARRAY['pending_review'::text, 'approved'::text, 'rejected'::text])),
+  rejection_reason text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT agent_profiles_pkey PRIMARY KEY (id),
+  CONSTRAINT agent_profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.chat_messages (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  sender_id uuid NOT NULL,
+  sender_role text NOT NULL CHECK (sender_role = ANY (ARRAY['user'::text, 'agent'::text])),
+  receiver_id uuid NOT NULL,
+  message text NOT NULL,
+  read boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT chat_messages_pkey PRIMARY KEY (id),
+  CONSTRAINT chat_messages_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES auth.users(id),
+  CONSTRAINT chat_messages_receiver_id_fkey FOREIGN KEY (receiver_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.user_profiles (
+  id uuid NOT NULL,
+  email text NOT NULL,
+  full_name text NOT NULL,
+  role text NOT NULL DEFAULT 'user'::text CHECK (role = 'user'::text),
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT user_profiles_pkey PRIMARY KEY (id),
+  CONSTRAINT user_profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
+);
