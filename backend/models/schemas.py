@@ -16,7 +16,7 @@ class SenderRole(str, Enum):
     USER = "user"
     AGENT = "agent"
 
-class MessageStatus(str, Enum):
+class AgentStatus(str, Enum):
     PENDING_REVIEW = "pending_review"
     APPROVED = "approved"
     REJECTED = "rejected" 
@@ -64,7 +64,7 @@ class AgentProfileSchema(BaseModel):
     vehicle_insurance_url: Optional[str] = None
     profile_photo_url: Optional[str] = None
     role: AgentRole
-    status: MessageStatus
+    status: AgentStatus
     rejection_reason: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
