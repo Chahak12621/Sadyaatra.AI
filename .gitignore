@@ -3,4 +3,9 @@ venv
 SUPABASE_SCHEMA.sql
 SUPABASE_CHECK.sql
 SUPABASE_POLICIES.sql
+docs/knowledge_base_rpc.sql
 .env.local
+
+# Python ignores
+__pycache__/
+*.py[cod]

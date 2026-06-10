@@ -5,7 +5,9 @@ from dotenv import load_dotenv
 from supabase import create_client, Client
 from typing import List, Dict, Any
 
-load_dotenv()
+current_dir = os.path.dirname(os.path.abspath(__file__))
+env_path = os.path.join(current_dir, '..', '.env.local')
+load_dotenv(env_path)
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") 
