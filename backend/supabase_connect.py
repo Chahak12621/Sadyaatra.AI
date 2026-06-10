@@ -45,7 +45,7 @@ try:
     print("for reading/writing data, not for querying database metadata ")
     print("(like raw schemas or security policies).")
     print("To view your schemas and policies, you should always use the ")
-    print("Supabase Dashboard or the SQL queries you ran earlier!")
+    print("Supabase Dashboard or SQL queries.")
     print("---------------------------------------------------------")
 
 except Exception as e:
