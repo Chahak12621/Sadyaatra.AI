@@ -52,3 +52,32 @@ def search_knowledge_base(query_embedding: List[float], match_threshold: float =
         }
     ).execute()
     return response.data
+
+def create_user_profile(user_data: Dict[str, Any]) -> Any:
+    response = supabase.table("user_profiles").insert(user_data).execute()
+    return response.data[0] if response.data else None
+
+def create_agent_profile(agent_data: Dict[str, Any]) -> Any:
+    response = supabase.table("agent_profiles").insert(agent_data).execute()
+    return response.data[0] if response.data else None
+
+def get_agent_profile(agent_id: str) -> Dict[str, Any]:
+    response = supabase.table("agent_profiles").select("*").eq("id", agent_id).execute()
+    return response.data[0] if response.data else None
+
+def create_trip_group(group_data: Dict[str, Any]) -> Any:
+    response = supabase.table("trip_groups").insert(group_data).execute()
+    return response.data[0] if response.data else None
+
+def add_group_member(group_id: str, user_id: str, role: str) -> Any:
+    data = {
+        "group_id": group_id,
+        "user_id": user_id,
+        "role": role
+    }
+    response = supabase.table("group_members").insert(data).execute()
+    return response.data[0] if response.data else None
+
+def get_user_itineraries(user_id: str) -> List[Dict[str, Any]]:
+    response = supabase.table("itineraries").select("*").eq("user_id", user_id).execute()
+    return response.data

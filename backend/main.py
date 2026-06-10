@@ -5,6 +5,8 @@ from core.llm_client import chat_with_agent, generate_itinerary
 from core.supabase_client import save_itinerary
 import json
 
+from routers import users, agents, groups, itineraries
+
 app = FastAPI(title="Sadyaatra Backend API")
 
 app.add_middleware(
@@ -15,20 +17,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include routers
+app.include_router(users.router)
+app.include_router(agents.router)
+app.include_router(groups.router)
+app.include_router(itineraries.router)
+
 @app.get("/")
 def health_check():
     return {"status": "ok", "message": "Sadyaatra API is running!"}
 
 @app.post("/api/chat")
 def chat_endpoint(request: ChatRequest):
-    """
-    Handles conversational interactions with the travel agent AI,
-    enhanced by Retrieval-Augmented Generation (RAG).
-    """
-    messages = [{"role": msg.role, "content": msg.content} for msg in request.messages]
     
-    # --- RAG RETRIEVAL ---
-    # Get the latest message the user sent to search for relevant facts
+    messages = [{"role": msg.role, "content": msg.content} for msg in request.messages]
+   
     latest_user_msg = request.messages[-1].content if request.messages else ""
     rag_context = ""
     
@@ -37,14 +40,9 @@ def chat_endpoint(request: ChatRequest):
             from core.embedding_client import generate_embedding
             from core.supabase_client import search_knowledge_base
             
-            # 1. Convert user message to numbers
             query_embedding = generate_embedding(latest_user_msg)
-            
-            # 2. Search database for matching facts
-            # We use a lower threshold (0.4) for testing to catch more potential matches
             matching_facts = search_knowledge_base(query_embedding, match_threshold=0.4, match_count=3)
             
-            # 3. Format facts into a string
             if matching_facts:
                 rag_context = "IMPORTANT INTERNAL FACTS from the database to help answer the user:\n"
                 for fact in matching_facts:
@@ -52,14 +50,11 @@ def chat_endpoint(request: ChatRequest):
         except Exception as e:
             print(f"Warning: RAG Retrieval failed: {e}")
 
-    # Base persona for the agent
     system_prompt = "You are a helpful, expert travel agent for Sadyaatra. Keep your responses concise and engaging."
     
-    # Inject RAG facts if we found any
     if rag_context:
         system_prompt += f"\n\n{rag_context}\n"
         
-    # If the frontend passes any specific context
     if request.current_context:
         system_prompt += f" Context to keep in mind: {request.current_context}"
         
